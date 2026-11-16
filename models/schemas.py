@@ -55,7 +55,7 @@ class Signal(BaseModel):
     @field_validator("source_url")
     @classmethod
     def require_http_url(cls, v: str) -> str:
-        if not v.startswith(("http://", "https://")):
+        if not v.lower().startswith(("http://", "https://")):  # schemes are case-insensitive
             raise ValueError("source_url must be an http(s) URL")
         return v
 
@@ -116,6 +116,8 @@ class AgentState(TypedDict, total=False):
 
     # Extractor
     extracted_signals: list[dict[str, Any]]
+    extraction_stats: dict[str, dict[str, int]]
+    """Per competitor: candidates, invalid, ungrounded, low_confidence, accepted."""
 
     # Synthesizer
     briefing: str
