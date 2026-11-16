@@ -16,13 +16,13 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
 
 from openai import OpenAI
 from pydantic import ValidationError
 
 from config import Settings, get_settings
 from models.schemas import AgentState, Signal
+from tools.urls import normalize_url
 
 logger = logging.getLogger(__name__)
 
@@ -43,15 +43,6 @@ Rules:
 - Skip anything already listed under PREVIOUSLY KNOWN.
 - Rumours or speculation get confidence below 0.5.
 Respond with JSON: {"signals": [...]}. Return {"signals": []} if nothing qualifies."""
-
-
-def normalize_url(url: str) -> str:
-    """Canonical form for grounding comparison: lowercase scheme/host,
-    drop fragment and trailing slash. Query strings are kept (they can identify
-    distinct pages)."""
-    parts = urlsplit(url.strip())
-    path = parts.path.rstrip("/")
-    return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), path, parts.query, ""))
 
 
 class ExtractorAgent:
