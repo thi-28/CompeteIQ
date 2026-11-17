@@ -89,11 +89,19 @@ def recursion_limit(settings: Settings) -> int:
     return 1 + 4 + 5 * settings.max_research_retries + 2 + 5
 
 
-def run_pipeline(competitors: list[str] | None = None, deps: Dependencies | None = None) -> RunResult:
+def new_run_id() -> str:
+    return uuid.uuid4().hex[:12]
+
+
+def run_pipeline(
+    competitors: list[str] | None = None,
+    deps: Dependencies | None = None,
+    run_id: str | None = None,
+) -> RunResult:
     deps = deps or Dependencies.default()
     settings = deps.settings
     competitors = competitors or settings.default_competitors
-    run_id = uuid.uuid4().hex[:12]
+    run_id = run_id or new_run_id()
     started_at = utc_now()
 
     initial: AgentState = {

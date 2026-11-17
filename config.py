@@ -40,6 +40,8 @@ class Settings:
     sqlite_db_path: str = "./data/competeiq.db"
     chroma_persist_dir: str = "./data/chroma"
     log_level: str = "INFO"
+    api_key: str | None = None
+    """If set, POST /run requires the X-API-Key header."""
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -67,6 +69,7 @@ class Settings:
             sqlite_db_path=env("SQLITE_DB_PATH", d.sqlite_db_path),
             chroma_persist_dir=env("CHROMA_PERSIST_DIR", d.chroma_persist_dir),
             log_level=env("LOG_LEVEL", d.log_level),
+            api_key=env("API_KEY") or None,
         )
 
 
