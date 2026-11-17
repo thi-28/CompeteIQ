@@ -102,6 +102,9 @@ class AgentState(TypedDict, total=False):
 
     # Supervisor
     search_queries: dict[str, list[str]]
+    """Current queries per competitor (replaced for a competitor on rewrite)."""
+    query_history: dict[str, list[str]]
+    """Every query tried per competitor, so rewrites never repeat one."""
     retry_counts: dict[str, int]
     """Re-search attempts per competitor; supervisor stops at MAX_RESEARCH_RETRIES."""
     low_signal_competitors: list[str]
