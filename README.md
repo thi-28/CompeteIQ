@@ -4,7 +4,7 @@ Multi-agent competitive-intelligence pipeline built with LangGraph. It searches 
 for news about a set of AI competitors, extracts source-grounded signals, and writes a
 weekly markdown briefing backed by SQLite and ChromaDB memory.
 
-> Work in progress. Being rebuilt stage by stage; full documentation lands in the final stage.
+> Work in progress. Being built stage by stage; full documentation lands in the final stage.
 
 ## Configuration
 
