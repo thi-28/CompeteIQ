@@ -34,6 +34,23 @@ docker compose up --build        # API on :8000, dashboard on :8501
 docker compose run --rm api python main.py   # one pipeline run into the shared volume
 ```
 
+## Evaluation
+
+`python evals/run_eval.py --judge` scores the extractor on 20 labeled synthetic snippets
+(see [evals/README.md](evals/README.md) for the dataset and metric definitions).
+
+Results: _placeholder, not yet run. Fill in from the script's output._
+
+| Metric | Value |
+|---|---|
+| Extraction precision (strict) | _TBD_ |
+| Extraction recall (strict) | _TBD_ |
+| F1 (strict) | _TBD_ |
+| Precision / recall (type-agnostic) | _TBD_ |
+| Negative rejection (rumor, opinion, off-topic) | _TBD_ |
+| URL grounding before guard | _TBD_ |
+| Faithfulness (LLM judge) | _TBD_ |
+
 ## GitHub Actions
 
 - `ci.yml`: pytest with coverage (threshold in `.coveragerc`) and a Docker build, on every push and PR. Needs no secrets.

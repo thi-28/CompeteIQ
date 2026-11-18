@@ -1,0 +1,254 @@
+{
+  "description": "Synthetic labeled snippets for extraction evals. Companies and URLs are fictional (.example is a reserved TLD).",
+  "cases": [
+    {
+      "id": "corvid-01",
+      "competitor": "Corvid Labs",
+      "snippet": {
+        "url": "https://news.example/corvid-3-launch",
+        "title": "Corvid Labs releases Corvid 3",
+        "content": "Corvid Labs on Tuesday released Corvid 3, a multimodal model that accepts text, images and audio. It is available today through the Corvid API and in the company's chat app, with a 1 million token context window."
+      },
+      "expected": [
+        "product_launch"
+      ],
+      "note": "Concrete launch, available now."
+    },
+    {
+      "id": "corvid-02",
+      "competitor": "Corvid Labs",
+      "snippet": {
+        "url": "https://news.example/corvid-mini-price-cut",
+        "title": "Corvid Labs cuts Corvid 3 Mini API prices by 40%",
+        "content": "Corvid Labs said it will cut API prices for Corvid 3 Mini by 40% effective March 1, bringing input tokens to $0.09 per million. The company said the cut reflects lower serving costs."
+      },
+      "expected": [
+        "pricing_change"
+      ],
+      "note": "Explicit price change with date."
+    },
+    {
+      "id": "corvid-03",
+      "competitor": "Corvid Labs",
+      "snippet": {
+        "url": "https://news.example/corvid-acquisition-rumor",
+        "title": "Corvid Labs could be weighing an acquisition, sources say",
+        "content": "Corvid Labs may be exploring the purchase of a robotics startup, according to two people who asked not to be named. No deal has been agreed and talks could still collapse. Corvid Labs declined to comment."
+      },
+      "expected": [],
+      "note": "Rumor from unnamed sources; must not pass the confidence gate."
+    },
+    {
+      "id": "corvid-04",
+      "competitor": "Corvid Labs",
+      "snippet": {
+        "url": "https://news.example/corvid-coo",
+        "title": "Corvid Labs hires Dana Reyes as COO",
+        "content": "Corvid Labs named Dana Reyes, previously head of operations at a large cloud provider, as its chief operating officer. Reyes starts next month and will oversee go-to-market and infrastructure."
+      },
+      "expected": [
+        "executive_move"
+      ],
+      "note": "Named executive hire."
+    },
+    {
+      "id": "corvid-05",
+      "competitor": "Corvid Labs",
+      "snippet": {
+        "url": "https://news.example/nimbus-office-mentions-corvid",
+        "title": "Nimbus AI expands; analysts compare it with Corvid Labs",
+        "content": "Nimbus AI opened a new engineering hub this week. Analysts said the move puts Nimbus in closer competition with Corvid Labs, whose models remain popular with developers."
+      },
+      "expected": [],
+      "note": "Off-topic: the development belongs to Nimbus AI, not Corvid Labs."
+    },
+    {
+      "id": "nimbus-01",
+      "competitor": "Nimbus AI",
+      "snippet": {
+        "url": "https://news.example/nimbus-atlas-partnership",
+        "title": "Nimbus AI signs multi-year deal with Atlas Cloud",
+        "content": "Nimbus AI and Atlas Cloud signed a multi-year agreement under which Atlas will host Nimbus models for its enterprise customers. Financial terms were not disclosed."
+      },
+      "expected": [
+        "partnership"
+      ],
+      "note": "Signed partnership."
+    },
+    {
+      "id": "nimbus-02",
+      "competitor": "Nimbus AI",
+      "snippet": {
+        "url": "https://news.example/nimbus-singapore",
+        "title": "Nimbus AI opens Singapore office, adds APAC data residency",
+        "content": "Nimbus AI opened its first Asia-Pacific office in Singapore and launched in-region data residency for customers in the region, the company announced."
+      },
+      "expected": [
+        "market_expansion"
+      ],
+      "note": "New region and office."
+    },
+    {
+      "id": "nimbus-03",
+      "competitor": "Nimbus AI",
+      "snippet": {
+        "url": "https://news.example/nimbus-paper",
+        "title": "Nimbus AI publishes paper on sparse attention training",
+        "content": "Researchers at Nimbus AI published a paper describing a sparse attention training method that they say halves training compute at equal quality. The paper includes benchmark results and the code is on GitHub."
+      },
+      "expected": [
+        "research_release"
+      ],
+      "note": "Paper plus code; research, not a product."
+    },
+    {
+      "id": "nimbus-04",
+      "competitor": "Nimbus AI",
+      "snippet": {
+        "url": "https://news.example/nimbus-oped",
+        "title": "Opinion: Nimbus AI's strategy might not work",
+        "content": "In this column, our writer argues that Nimbus AI could struggle to differentiate if larger rivals keep cutting prices. This is an opinion piece; Nimbus AI has not announced any change in strategy."
+      },
+      "expected": [],
+      "note": "Opinion, no concrete development."
+    },
+    {
+      "id": "nimbus-05",
+      "competitor": "Nimbus AI",
+      "snippet": {
+        "url": "https://news.example/nimbus-voice-and-pro-price",
+        "title": "Nimbus AI launches Nimbus Voice and raises Pro plan price",
+        "content": "Nimbus AI launched Nimbus Voice, a real-time speech assistant, for all users on Thursday. In the same announcement the company said the Pro plan will rise from $20 to $25 a month for new subscribers."
+      },
+      "expected": [
+        "product_launch",
+        "pricing_change"
+      ],
+      "note": "Two distinct developments in one snippet (tests recall)."
+    },
+    {
+      "id": "halyard-01",
+      "competitor": "Halyard",
+      "snippet": {
+        "url": "https://news.example/halyard-studio-ga",
+        "title": "Halyard Studio is now generally available",
+        "content": "Halyard announced general availability of Halyard Studio, its agent-building workspace, after a six-month beta. Studio is included in all paid plans starting today."
+      },
+      "expected": [
+        "product_launch"
+      ],
+      "note": "GA launch."
+    },
+    {
+      "id": "halyard-02",
+      "competitor": "Halyard",
+      "snippet": {
+        "url": "https://news.example/halyard-cto-departs",
+        "title": "Halyard CTO Sam Okafor steps down",
+        "content": "Halyard said chief technology officer Sam Okafor is stepping down at the end of the quarter. The company has begun a search for a successor and the head of research will serve as interim CTO."
+      },
+      "expected": [
+        "executive_move"
+      ],
+      "note": "Executive departure."
+    },
+    {
+      "id": "halyard-03",
+      "competitor": "Halyard",
+      "snippet": {
+        "url": "https://news.example/ai-tools-listicle",
+        "title": "10 AI tools to try this year",
+        "content": "Our roundup of AI tools worth trying includes writing assistants, coding copilots and agent builders such as Halyard Studio, alongside a dozen other products."
+      },
+      "expected": [],
+      "note": "Listicle mention, no news."
+    },
+    {
+      "id": "halyard-04",
+      "competitor": "Halyard",
+      "snippet": {
+        "url": "https://news.example/halyard-hospital-partnership",
+        "title": "Halyard partners with Meridian Health network",
+        "content": "Halyard and the Meridian Health hospital network announced a partnership to pilot Halyard agents for clinical documentation across 12 hospitals, starting this spring."
+      },
+      "expected": [
+        "partnership"
+      ],
+      "note": "Announced partnership."
+    },
+    {
+      "id": "halyard-05",
+      "competitor": "Halyard",
+      "snippet": {
+        "url": "https://news.example/halyard-job-posting",
+        "title": "Senior ML Engineer, Halyard",
+        "content": "Halyard is hiring a senior machine learning engineer to work on evaluation infrastructure. Remote within the US. Apply via the careers page."
+      },
+      "expected": [],
+      "note": "Single job posting; not a competitive development."
+    },
+    {
+      "id": "tessellate-01",
+      "competitor": "Tessellate",
+      "snippet": {
+        "url": "https://news.example/tessellate-japan",
+        "title": "Tessellate launches in Japan with Japanese-language model",
+        "content": "Tessellate launched its assistant in Japan with a Japanese-language model and local billing in yen, its first market outside North America and Europe."
+      },
+      "expected": [
+        "market_expansion"
+      ],
+      "note": "New market."
+    },
+    {
+      "id": "tessellate-02",
+      "competitor": "Tessellate",
+      "snippet": {
+        "url": "https://news.example/tessellate-free-tier",
+        "title": "Tessellate introduces a free tier",
+        "content": "Tessellate introduced a free tier for its API that includes 1 million tokens per month, alongside its existing paid plans, the company said on its blog."
+      },
+      "expected": [
+        "pricing_change"
+      ],
+      "note": "Pricing model change."
+    },
+    {
+      "id": "tessellate-03",
+      "competitor": "Tessellate",
+      "snippet": {
+        "url": "https://news.example/tessellate-safety-report",
+        "title": "Tessellate publishes model safety evaluation report",
+        "content": "Tessellate published a 60-page report detailing safety evaluations of its latest model, including red-teaming results and the benchmarks it used."
+      },
+      "expected": [
+        "research_release"
+      ],
+      "note": "Published research report."
+    },
+    {
+      "id": "tessellate-04",
+      "competitor": "Tessellate",
+      "snippet": {
+        "url": "https://news.example/tessellate-funding-talks",
+        "title": "Tessellate reportedly in talks to raise new funding",
+        "content": "Tessellate is reportedly in early talks with investors about a new funding round, according to people familiar with the matter. The terms could change and no agreement has been reached."
+      },
+      "expected": [],
+      "note": "Rumor; must be filtered."
+    },
+    {
+      "id": "tessellate-05",
+      "competitor": "Tessellate",
+      "snippet": {
+        "url": "https://news.example/tessellate-series-c",
+        "title": "Tessellate closes $200M Series C",
+        "content": "Tessellate said it has closed a $200 million Series C round led by Northfield Ventures. The company plans to use the funds to expand its research team."
+      },
+      "expected": [
+        "other"
+      ],
+      "note": "Confirmed funding; no dedicated type, so 'other'."
+    }
+  ]
+}
