@@ -1,0 +1,24 @@
+# Secrets never enter the image; compose injects them at runtime via env_file.
+.env
+.env.*
+!.env.example
+
+# Runtime data lives in the named volume, not the image.
+data/
+
+.git/
+.github/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+tests/
+evals/
+.vscode/
+.idea/
+.DS_Store
+*.log

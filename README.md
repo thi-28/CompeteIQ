@@ -22,6 +22,14 @@ Copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `TAVILY_API_KEY`.
 
 ```bash
 python3.11 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 pytest
+```
+
+## Docker
+
+```bash
+cp .env.example .env            # add your keys
+docker compose up --build        # API on :8000, dashboard on :8501
+docker compose run --rm api python main.py   # one pipeline run into the shared volume
 ```
