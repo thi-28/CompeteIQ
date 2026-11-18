@@ -196,6 +196,14 @@ def test_fatal_error_still_records_failed_run(make_deps):
     assert row["success"] is False and row["error_count"] == 1
 
 
+def test_run_with_no_search_results_at_all_is_failed(make_deps):
+    deps = make_deps({}, FakeLLM())  # every query returns nothing (e.g. bad Tavily key)
+    result = run_pipeline(["A", "B"], deps)
+    assert not result.success and result.signal_count == 0
+    assert deps.semantic.get_run(result.run_id)["success"] is False
+    assert result.briefing_id  # the briefing still records what happened
+
+
 def test_graph_structure(make_deps):
     graph = build_graph(make_deps({}, FakeLLM())).get_graph()
     edges = {(e.source, e.target) for e in graph.edges}

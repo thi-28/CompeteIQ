@@ -118,6 +118,13 @@ def run_pipeline(
         logger.exception("Pipeline run %s failed", run_id)
         final = {"errors": [f"fatal: {exc}"]}
         success = False
+    else:
+        # Zero signals can be a quiet week; zero snippets for every competitor
+        # means search itself was broken (bad keys, quota, outage), so don't
+        # report that run as a success.
+        if not any(final.get("snippets", {}).values()):
+            logger.error("Run %s collected no snippets for any competitor", run_id)
+            success = False
 
     result = RunResult(
         run_id=run_id,

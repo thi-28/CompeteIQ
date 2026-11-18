@@ -1,0 +1,11 @@
+[run]
+source = .
+omit =
+    tests/*
+    evals/*
+    .venv/*
+
+[report]
+fail_under = 85
+show_missing = true
+skip_covered = true

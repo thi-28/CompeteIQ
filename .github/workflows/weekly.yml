@@ -1,0 +1,129 @@
+name: Weekly pipeline
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"   # Mondays 08:00 UTC
+  workflow_dispatch:
+    inputs:
+      competitors:
+        description: "Comma-separated competitors (blank = DEFAULT_COMPETITORS)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  actions: read   # lets `gh run download` fetch the previous run's data artifact
+
+# Never let two runs read and write data/ at the same time.
+concurrency:
+  group: weekly-pipeline
+  cancel-in-progress: false
+
+env:
+  DATA_CACHE_PREFIX: competeiq-data-
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+      DATA_DIR: ./data
+      SQLITE_DB_PATH: ./data/competeiq.db
+      CHROMA_PERSIST_DIR: ./data/chroma
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check secrets
+        run: |
+          missing=""
+          [ -n "$OPENAI_API_KEY" ] || missing="$missing OPENAI_API_KEY"
+          [ -n "$TAVILY_API_KEY" ] || missing="$missing TAVILY_API_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing"
+            exit 1
+          fi
+
+      # Restore memory. Each run saves a uniquely keyed cache, and the prefix
+      # match restores the newest one.
+      - name: Restore data/ from cache
+        id: restore
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: ${{ env.DATA_CACHE_PREFIX }}${{ github.run_id }}
+          restore-keys: ${{ env.DATA_CACHE_PREFIX }}
+
+      # GitHub evicts caches unused for 7 days, which a weekly schedule can hit.
+      # The newest unexpired data/ artifact (90-day retention) is the fallback.
+      - name: Fall back to latest data artifact
+        if: steps.restore.outputs.cache-matched-key == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prev=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=competeiq-data&per_page=1" \
+                 --jq '.artifacts[] | select(.expired == false) | .workflow_run.id')
+          if [ -z "$prev" ]; then
+            echo "::warning::No cache or artifact found; starting with empty memory (expected on the first run)."
+          elif gh run download "$prev" --repo "$GITHUB_REPOSITORY" -n competeiq-data -D data; then
+            echo "Restored data/ from the artifact of run $prev"
+          else
+            # Don't run (and then save) on empty memory when history exists.
+            echo "::error::Previous data exists (run $prev) but could not be downloaded."
+            exit 1
+          fi
+
+      - name: Show restored memory
+        run: |
+          mkdir -p data
+          ls -la data
+          du -sh data
+
+      - name: Run pipeline
+        id: pipeline
+        env:
+          COMPETITORS: ${{ inputs.competitors }}
+        run: |
+          set -o pipefail
+          args=()
+          [ -n "$COMPETITORS" ] && args=(--competitors "$COMPETITORS")
+          python main.py "${args[@]}" | tee run.log
+
+      - name: Add briefing to job summary
+        if: always()
+        run: |
+          briefing=$(sed -n 's/^Briefing: //p' run.log 2>/dev/null | tail -n 1)
+          if [ -n "$briefing" ] && [ -f "$briefing" ]; then
+            cat "$briefing" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No briefing produced. See the Run pipeline step log." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Save even when the pipeline failed (the failed run record is history too),
+      # but only if memory was restored first, so an early failure can never
+      # publish an empty snapshot as the newest one.
+      - name: Save data/ to cache
+        if: always() && steps.restore.outcome == 'success' && steps.pipeline.outcome != 'skipped'
+        uses: actions/cache/save@v4
+        with:
+          path: data
+          key: ${{ env.DATA_CACHE_PREFIX }}${{ github.run_id }}
+
+      - name: Upload data/ artifact
+        if: always() && steps.restore.outcome == 'success' && steps.pipeline.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: competeiq-data
+          path: data
+          retention-days: 90
+          include-hidden-files: true

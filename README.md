@@ -33,3 +33,10 @@ cp .env.example .env            # add your keys
 docker compose up --build        # API on :8000, dashboard on :8501
 docker compose run --rm api python main.py   # one pipeline run into the shared volume
 ```
+
+## GitHub Actions
+
+- `ci.yml`: pytest with coverage (threshold in `.coveragerc`) and a Docker build, on every push and PR. Needs no secrets.
+- `weekly.yml`: runs the pipeline Mondays 08:00 UTC (or on demand). Restores `data/` from the newest cache,
+  falls back to the latest `competeiq-data` artifact if the cache was evicted, then saves both after the run.
+  Requires repository secrets `OPENAI_API_KEY` and `TAVILY_API_KEY`.
