@@ -37,7 +37,7 @@ typed with the closest `signal_type` (funding goes to `other`).
 | Precision / recall (type-agnostic) | Same, ignoring type; the gap shows typing errors vs detection errors |
 | Negative rejection | Share of no-signal snippets that produced zero accepted signals |
 | URL grounding before guard | Share of raw model candidates citing a provided URL. The guard drops the rest, so stored signals are always grounded; this shows how often the model invents sources |
-| Faithfulness | Share of accepted signals whose title and summary an LLM judge finds fully supported by the cited snippet |
+| Faithfulness | Share of accepted signals with no invented facts. The judge lists the claim's concrete facts (names, numbers, dates, events) and flags any the snippet doesn't support; commentary on significance is ignored because the extractor is asked to write it |
 
 Limits: 20 synthetic snippets give coarse numbers (one signal moves precision by about
 0.07). The judge defaults to the extraction model, which can be lenient toward its own

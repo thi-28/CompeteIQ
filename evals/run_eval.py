@@ -20,8 +20,10 @@ Metrics
 - URL grounding (pre-guard): share of raw model candidates whose URL matches a
   provided snippet. The guard drops the rest, so this measures how often the
   model invents sources, not what gets stored.
-- faithfulness (--judge): share of accepted signals whose title and summary
-  are fully supported by their source snippet, as judged by an LLM.
+- faithfulness (--judge): share of accepted signals with no invented facts.
+  An LLM judge lists the claim's concrete facts and flags any the snippet does
+  not support; commentary on significance is ignored, since the extractor is
+  asked to write it.
 """
 
 from __future__ import annotations
@@ -43,11 +45,17 @@ from tools.urls import normalize_url  # noqa: E402
 
 DATASET = Path(__file__).resolve().parent / "dataset.json"
 
-JUDGE_PROMPT = """You check whether an extracted claim is supported by its source text.
-Given a SOURCE and a CLAIM (title + summary), answer whether every factual statement in
-the claim is stated in or directly implied by the source. Commentary on why it matters
-is fine; new facts, numbers, names or dates that are not in the source are not.
-Respond with JSON: {"supported": true|false, "reason": "<one sentence>"}"""
+JUDGE_PROMPT = """You check an extracted claim against its source text for invented facts.
+
+1. List every concrete factual statement in the CLAIM: events, names, numbers, prices,
+   dates, products, places, and who did what.
+2. Ignore analysis of significance, motives or likely effects (for example "this could
+   increase adoption" or "positions the company to compete"). The extractor is asked to
+   add that commentary, so it is never a failure.
+3. A fact is unsupported if the SOURCE neither states nor directly implies it.
+
+Respond with JSON:
+{"unsupported_facts": ["<fact>", ...], "supported": <true if unsupported_facts is empty>}"""
 
 
 def load_dataset(path: Path = DATASET) -> list[dict[str, Any]]:
@@ -157,8 +165,10 @@ def judge_faithfulness(results: dict[str, dict[str, Any]], client: Any, model: s
                 ],
             )
             data = json.loads(resp.choices[0].message.content or "{}")
+            unsupported = data.get("unsupported_facts") or []
             verdicts.append({"title": sig["title"], "source_url": sig["source_url"],
-                             "supported": data.get("supported") is True, "reason": data.get("reason", "")})
+                             "supported": data.get("supported") is True and not unsupported,
+                             "unsupported_facts": unsupported})
     supported = sum(v["supported"] for v in verdicts)
     return {"faithfulness": _ratio(supported, len(verdicts)), "judge_model": model, "verdicts": verdicts}
 
@@ -193,6 +203,8 @@ def evaluate(cases: list[dict[str, Any]], client: Any, settings: Settings, judge
         "confidence_threshold": settings.confidence_threshold,
         "metrics": score(cases, results),
         "accepted": {comp: r["accepted"] for comp, r in results.items()},
+        # Raw model output, so dropped candidates (invalid, ungrounded, low confidence) can be inspected.
+        "candidates": {comp: r["candidates"] for comp, r in results.items()},
     }
     if judge:
         report["faithfulness"] = judge_faithfulness(results, client, judge_model or settings.openai_model)

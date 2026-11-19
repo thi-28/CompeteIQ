@@ -76,7 +76,8 @@ class FakeClient:
             assert system == run_eval.JUDGE_PROMPT
             self.judged.append(model)
             claim = user.split("CLAIM:\n", 1)[1]
-            payload = {"supported": not claim.startswith("Corvid 3\n"), "reason": "r"}
+            bad = claim.startswith("Corvid 3\n")
+            payload = {"supported": not bad, "unsupported_facts": ["invented date"] if bad else []}
         return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(payload)))])
 
 
@@ -106,7 +107,9 @@ def test_faithfulness_uses_judge_model(report):
     f = report["faithfulness"]
     assert f["judge_model"] == "judge-x" and set(report["_client"].judged) == {"judge-x"}
     assert f["faithfulness"] == round(14 / 15, 3)
-    assert [v["title"] for v in f["verdicts"] if not v["supported"]] == ["Corvid 3"]
+    assert [(v["title"], v["unsupported_facts"]) for v in f["verdicts"] if not v["supported"]] == [
+        ("Corvid 3", ["invented date"])]
+    assert len(report["candidates"]["Tessellate"]) == 5  # raw output kept, incl. the invalid one
 
 
 def test_markdown_table_and_cli(report, monkeypatch, tmp_path, capsys):
