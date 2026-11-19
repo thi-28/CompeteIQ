@@ -152,32 +152,73 @@ Each competitor keeps the same color in every chart, and every chart has a table
 snippets that should yield nothing (rumor, opinion, off-topic, listicle, job post). The
 dataset and metric definitions are in [evals/README.md](evals/README.md).
 
-Results: _placeholder, not yet run. Fill in from the script's output._
+Results from a real run on 2026-11-19 with `gpt-4o-mini`, judged by `gpt-4o-mini`. The numbers
+were identical across two runs.
 
 | Metric | Value |
 |---|---|
-| Extraction precision (strict) | _TBD_ |
-| Extraction recall (strict) | _TBD_ |
-| F1 (strict) | _TBD_ |
-| Precision / recall (type-agnostic) | _TBD_ |
-| Negative rejection (rumor, opinion, off-topic) | _TBD_ |
-| URL grounding before guard | _TBD_ |
-| Faithfulness (LLM judge) | _TBD_ |
+| Extraction precision (strict) | 0.92 |
+| Extraction recall (strict) | 0.80 |
+| F1 (strict) | 0.86 |
+| Precision / recall (type-agnostic) | 1.00 / 0.87 |
+| Negative rejection (rumor, opinion, off-topic) | 1.00 |
+| URL grounding before guard | 1.00 |
+| Faithfulness (LLM judge) | 1.00 |
+
+What the misses were:
+
+- **Missed second signal.** The model found the launch in the two-signal snippet but missed the
+  price change in it.
+- **Typed a free tier as a launch.** It labeled a new free tier `product_launch` where the gold
+  label is `pricing_change`.
+- **Invented a signal type.** It labeled a confirmed funding round `funding_change`, which isn't
+  in the schema, so schema validation dropped it.
+- **Rumor dropped as designed.** It gave the rumor confidence 0.5, below the 0.6 gate.
+
+On this set, every accepted signal had confidence 1.0, so the confidence gate is only doing
+coarse filtering here.
 
 ## Sample output
 
-_Placeholder: this section will show an excerpt of a real briefing from a real run, copied
-from `data/briefings/<run_id>.md`, together with the run's date and model. No example is shown
-until then, so nothing here is invented._
+Here is an excerpt from a real run: `python main.py` on 2026-11-19 with `gpt-4o-mini`, 5
+competitors, 69 seconds. The run produced 22 signals with 0 errors, and no competitor needed a
+re-search. One candidate was dropped by the grounding guard: the model cited a Yahoo Finance URL
+for Meta that was not among the collected snippets.
 
-A briefing has these sections:
+```markdown
+# CompeteIQ Briefing: 2026-11-19
 
-- `# CompeteIQ Briefing: <date>`
-- `## Executive Summary`
-- `## Key Developments`, with one `### <competitor>` block per competitor. Each development has
-  its type, impact, confidence and a `[source](url)` link.
-- `## Strategic Implications`, with `[n]` citations to the developments.
-- `## Signals to Watch`
+## Executive Summary
+
+The AI market is witnessing significant partnerships and product launches, particularly from
+Anthropic, Google, Meta, and Perplexity, indicating a robust competitive landscape. [...]
+
+## Key Developments
+
+### Mistral
+
+- **[14] Product Launch: Launch of Mistral Large 4 with Open-Weight Support** (HIGH impact, confidence 0.90)
+  Mistral Large 4 has been launched in public preview, featuring open-weight multimodal
+  capabilities. This positions Mistral as a strong competitor in the AI model market.
+  [source](https://releasebot.io/updates/mistral)
+- **[15] Product Launch: Introduction of Voxtral TTS Speech Model** (HIGH impact, confidence 0.90)
+  Mistral has launched Voxtral TTS, an open-source text-to-speech model aimed at enterprise
+  applications. [...] [source](https://cryptorank.io/ru/news/feed/3a958-mistral-ai-voxtral-tts-speech-model)
+
+[...]
+
+## Strategic Implications
+
+- Perplexity's integration into Microsoft 365 apps broadens its market reach, allowing users to
+  leverage AI workflows in widely used applications [21].
+```
+
+Known limitations seen in this run:
+
+- **No recency filter on search.** Some signals came from older articles; one source URL is from
+  2025.
+- **Non-developments get through.** At least one accepted signal wasn't a real development
+  ("CEO continues leadership").
 
 ## GitHub Actions
 

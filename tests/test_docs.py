@@ -35,6 +35,10 @@ def test_readme_api_table_matches_routes():
     assert documented == actual
 
 
-def test_readme_has_no_fabricated_results():
-    assert "_TBD_" in README and "Placeholder" in README
-    assert "news.example" not in README  # eval fixtures stay out of the sample-output section
+def test_readme_eval_table_is_complete_and_free_of_fixture_text():
+    eval_section = README.split("## Evaluation", 1)[1].split("## Sample output", 1)[0]
+    values = re.findall(r"^\| [^|]+ \| ([^|]+) \|$", eval_section, flags=re.M)[1:]  # skip header
+    assert len(values) == 7
+    # Either all placeholders or all filled from a run, never a mix.
+    assert all(v.strip() == "_TBD_" for v in values) or not any("TBD" in v for v in values)
+    assert "news.example" not in README  # eval fixtures never appear as sample output
