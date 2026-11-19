@@ -27,6 +27,7 @@ from dashboard.data import (  # noqa: E402
     runs_frame,
     signals_frame,
     type_counts,
+    week_tick_step,
     weekly_counts,
 )
 
@@ -100,8 +101,11 @@ with tab_signals:
         width="stretch",
         column_config={
             "date_detected": st.column_config.DatetimeColumn("Detected (UTC)", format="YYYY-MM-DD"),
+            "competitor": "Competitor",
             "signal_type": "Type",
             "impact_assessment": "Impact",
+            "title": "Title",
+            "summary": "Summary",
             "confidence": st.column_config.NumberColumn("Confidence", format="%.2f"),
             "source_url": st.column_config.LinkColumn("Source", display_text="open"),
             "run_id": "Run",
@@ -130,7 +134,9 @@ with tab_trends:
         fig.update_layout(
             title="Signals per week by competitor", hovermode="x unified",
             yaxis={"title": "Signals", "rangemode": "tozero", "gridcolor": "rgba(128,128,128,0.15)"},
-            xaxis={"title": "Week starting (UTC)", "showgrid": False},
+            # Ticks on the Monday week starts the points sit on (Plotly defaults to Sundays).
+            xaxis={"title": "Week starting (UTC)", "showgrid": False, "tickformat": "%b %d",
+                   "tick0": weekly["week"].min(), "dtick": week_tick_step(weekly)},
             legend={"orientation": "h", "y": -0.2}, margin={"t": 50, "l": 10, "r": 10},
         )
         st.plotly_chart(fig, width="stretch")
@@ -177,6 +183,8 @@ with tab_runs:
             column_config={
                 "started_at": st.column_config.DatetimeColumn("Started (UTC)", format="YYYY-MM-DD HH:mm"),
                 "status": "Status",
+                "run_id": "Run",
+                "competitors": "Competitors",
                 "signal_count": "Signals",
                 "error_count": "Errors",
                 "research_retries": "Re-searches",

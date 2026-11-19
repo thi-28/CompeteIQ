@@ -7,7 +7,7 @@ import requests
 import dashboard.data as data
 from dashboard.data import (
     CATEGORICAL, OTHER_COLOR, ApiClient, ApiError, color_map, ordered_competitors,
-    runs_frame, signals_frame, type_counts, weekly_counts,
+    runs_frame, signals_frame, type_counts, week_tick_step, weekly_counts,
 )
 
 SIGNALS = [
@@ -31,6 +31,13 @@ def test_weekly_counts_zero_fills_missing_weeks_and_competitors():
     assert [str(w.date()) for w in pivot.index] == ["2026-11-02", "2026-11-09", "2026-11-16"]
     assert pivot["Anthropic"].tolist() == [1, 0, 1]
     assert pivot["Meta"].tolist() == [1, 0, 0]
+
+
+def test_week_tick_step_thins_ticks_when_crowded():
+    week = 7 * 24 * 3600 * 1000
+    assert week_tick_step(weekly_counts(signals_frame(SIGNALS))) == week  # 3 weeks: every week
+    many = pd.DataFrame({"week": pd.date_range("2026-01-05", periods=25, freq="W-MON")})
+    assert week_tick_step(many) == 3 * week
 
 
 def test_weekly_counts_empty():

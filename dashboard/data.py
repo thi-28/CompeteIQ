@@ -109,6 +109,15 @@ def weekly_counts(df: pd.DataFrame) -> pd.DataFrame:
     return counts.reindex(full, fill_value=0).reset_index()
 
 
+WEEK_MS = 7 * 24 * 60 * 60 * 1000
+
+
+def week_tick_step(weekly: pd.DataFrame, max_ticks: int = 10) -> int:
+    """Plotly dtick (ms) that lands on week starts: every week, or every Nth week when crowded."""
+    n = weekly["week"].nunique() if not weekly.empty else 1
+    return WEEK_MS * max(1, -(-n // max_ticks))
+
+
 def type_counts(df: pd.DataFrame) -> pd.DataFrame:
     counts = df["signal_type"].value_counts() if not df.empty else pd.Series(dtype=int)
     out = pd.DataFrame({"signal_type": SIGNAL_TYPES, "signals": [int(counts.get(t, 0)) for t in SIGNAL_TYPES]})
