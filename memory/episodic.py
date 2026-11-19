@@ -96,7 +96,7 @@ class EpisodicMemory:
         )
         return [
             f"[{meta['date_detected'][:10]}] {doc}"
-            for doc, meta in zip(res["documents"][0], res["metadatas"][0])
+            for doc, meta in zip(res["documents"][0], res["metadatas"][0], strict=True)
         ]
 
     def store(self, signals: list[Signal], run_id: str) -> dict[str, Any]:
@@ -108,7 +108,7 @@ class EpisodicMemory:
             return {"stored": stored, "duplicates": duplicates}
 
         vectors = self._embed([signal_text(s) for s in signals])  # one batched call
-        for signal, vector in zip(signals, vectors):
+        for signal, vector in zip(signals, vectors, strict=True):
             sid = signal_id(signal)
             if self._is_duplicate(sid, signal.competitor, vector):
                 duplicates.append(sid)

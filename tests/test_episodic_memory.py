@@ -127,3 +127,10 @@ def test_openai_embedder_uses_configured_model_and_preserves_order():
     out = OpenAIEmbedder(Settings().embedding_model, client=client)(["a", "b"])
     assert out == [[1.0, 0.0], [0.0, 1.0]]
     client.embeddings.create.assert_called_once_with(model="text-embedding-3-small", input=["a", "b"])
+
+
+def test_store_rejects_embedder_returning_wrong_count(tmp_path):
+    """A short embedding batch must fail loudly, not silently drop signals."""
+    mem = EpisodicMemory(str(tmp_path / "c"), embedder=lambda texts: [fake_embed(texts)[0]], settings=Settings())
+    with pytest.raises(ValueError):
+        mem.store([sig(title="one"), sig(title="two", summary="different")], "r1")
